@@ -1,4 +1,4 @@
-package com.notes.command_for_main_menu;
+package com.notes.command.mainmenu;
 
 import com.notes.NotesManager;
 

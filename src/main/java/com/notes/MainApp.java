@@ -1,7 +1,7 @@
 package com.notes;
 
-import com.notes.command_for_main_menu.CommandExecutor;
-import com.notes.command_for_main_menu.Function;
+import com.notes.command.mainmenu.CommandExecutor;
+import com.notes.command.mainmenu.Function;
 import com.notes.exception.CannotSaveNoteException;
 import com.notes.exception.ThereIsNoNoteWithIdException;
 

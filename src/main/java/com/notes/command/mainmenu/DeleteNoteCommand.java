@@ -1,4 +1,4 @@
-package com.notes.command_for_main_menu;
+package com.notes.command.mainmenu;
 
 import com.notes.FileOperationService;
 import com.notes.NotesManager;
@@ -9,7 +9,7 @@ public class DeleteNoteCommand implements Command {
     public void execute() throws ThereIsNoNoteWithIdException {
         NotesManager.writeMessage("Deleting a note...");
 
-        if (!NotesManager.isNoteMapEmpty()) {
+        if (!NotesManager.isCacheEmpty()) {
             String message = "Enter the ID of the note you want to delete:";
 
             long id = NotesManager.parseToIdFromString(message);

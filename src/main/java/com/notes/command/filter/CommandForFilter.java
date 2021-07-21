@@ -1,4 +1,4 @@
-package com.notes.command_for_filter;
+package com.notes.command.filter;
 
 public interface CommandForFilter {
     void executeFilter();

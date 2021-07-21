@@ -1,9 +1,8 @@
 package com.notes;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.notes.command_for_filter.Filter;
-import com.notes.command_for_main_menu.Function;
-import com.notes.command_for_search.Search;
+import com.notes.command.filter.Filter;
+import com.notes.command.mainmenu.Function;
+import com.notes.command.search.Search;
 
 import java.io.*;
 import java.text.DateFormat;
@@ -17,36 +16,16 @@ import java.util.regex.Pattern;
  * FileOperationService.
  */
 public class NotesManager {
-    private static final String DIR = "notes_package/";
-    private static final File dir = new File(DIR);
-
     private static BufferedReader bis = new BufferedReader(new InputStreamReader(System.in));
     private static DateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
-    private static Map<Long, Note> noteMap = new HashMap<>();
+    private static Map<Long, Note> cache;
 
     /*
       A static initialization block in which, when the application starts, all json files are subtracted from
-      the dir directory. This is done using the getListOfFileNotes() method of the FileOperationService class.
+      the directory.
      */
     static {
-        if (dir.exists()) {
-            List<File> fileList = FileOperationService.getListOfFileNotes(dir);
-
-            for (File file : fileList) {
-                try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-                    while (reader.ready()) {
-                        String jsonString = reader.readLine();
-                        StringReader stringReader = new StringReader(jsonString);
-
-                        ObjectMapper mapper = new ObjectMapper();
-                        Note note = mapper.readValue(stringReader, Note.class);
-                        noteMap.put(note.getId(), note);
-                    }
-                } catch (IOException e) {
-                    // NOPE
-                }
-            }
-        }
+        cache = FileOperationService.loadNoteFromFileIntoCache();
     }
 
     /**
@@ -56,7 +35,7 @@ public class NotesManager {
      */
     public static void addNote(Note note) {
         if (note != null) {
-            noteMap.put(note.getId(), note);
+            cache.put(note.getId(), note);
         }
     }
 
@@ -66,7 +45,7 @@ public class NotesManager {
      * @param id
      */
     public static void deleteNote(Long id) {
-        noteMap.remove(id);
+        cache.remove(id);
     }
 
     /**
@@ -77,9 +56,9 @@ public class NotesManager {
      */
     public static void editNote(Note previous, Note modified) {
         if (previous != null && modified != null) {
-            if (noteMap.containsKey(previous.getId())) {
-                noteMap.remove(previous.getId());
-                noteMap.put(modified.getId(), modified);
+            if (cache.containsKey(previous.getId())) {
+                cache.remove(previous.getId());
+                cache.put(modified.getId(), modified);
             }
         }
     }
@@ -93,7 +72,7 @@ public class NotesManager {
     public static Set<Note> viewNotesFilteredByDate(Calendar dateForFilter) {
         Set<Note> resultSet = new HashSet<>();
 
-        for (Note note : getNoteSetFromMap()) {
+        for (Note note : getNoteSetFromCache()) {
             Calendar dateNote = new GregorianCalendar();
             dateNote.setTime(note.getDate());
 
@@ -115,7 +94,7 @@ public class NotesManager {
     public static Set<Note> viewNotesFilteredByHashTag(String hashTag) {
         Set<Note> resultSet = new HashSet<>();
 
-        for (Map.Entry<Long, Note> entry : noteMap.entrySet()) {
+        for (Map.Entry<Long, Note> entry : cache.entrySet()) {
             Set<String> hashTagList = entry.getValue().getHashTagSet();
 
             if (hashTagList.contains(hashTag)) {
@@ -134,7 +113,7 @@ public class NotesManager {
     public static Set<Note> searchNoteByText(String text) {
         Set<Note> resultSet = new HashSet<>();
 
-        for (Note note : getNoteSetFromMap()) {
+        for (Note note : getNoteSetFromCache()) {
             if (note.getText().toLowerCase().contains(text.toLowerCase())) {
                 resultSet.add(note);
             }
@@ -151,7 +130,7 @@ public class NotesManager {
     public static Set<Note> searchNoteByTitle(String title) {
         Set<Note> resultSet = new HashSet<>();
 
-        for (Note note : getNoteSetFromMap()) {
+        for (Note note : getNoteSetFromCache()) {
             if (note.getTitle().toLowerCase().contains(title.toLowerCase())) {
                 resultSet.add(note);
             }
@@ -168,8 +147,8 @@ public class NotesManager {
     public static Note getNoteById(Long id) {
         Note note = null;
         if (id != 0) {
-            if (noteMap.containsKey(id)) {
-                note = noteMap.get(id);
+            if (cache.containsKey(id)) {
+                note = cache.get(id);
             }
         }
         return note;
@@ -200,37 +179,37 @@ public class NotesManager {
     }
 
     /**
-     * Returns Map<Long, Note> noteMap
+     * Returns Map<Long, Note> cache
      *
-     * @return Map<Long       ,               Note>
+     * @return Map
      */
-    private static Map<Long, Note> getNoteMap() {
-        return noteMap;
+    private static Map<Long, Note> getCache() {
+        return cache;
     }
 
     /**
-     * Returns Set<Note> which is derived from Map<Long, Note> noteMap
+     * Returns Set<Note> which is derived from Map<Long, Note> cache
      *
      * @return Set<Note>
      */
-    public static Set<Note> getNoteSetFromMap() {
+    public static Set<Note> getNoteSetFromCache() {
         Set<Note> noteSet = new HashSet<>();
 
-        for (Map.Entry<Long, Note> entry : getNoteMap().entrySet()) {
+        for (Map.Entry<Long, Note> entry : getCache().entrySet()) {
             noteSet.add(entry.getValue());
         }
         return noteSet;
     }
 
     /**
-     * Returns true if Map<Long, Note> noteMap is empty or false if it contains elements.
+     * Returns true if Map<Long, Note> cache is empty or false if it contains elements.
      *
      * @return boolean
      */
-    public static boolean isNoteMapEmpty() {
+    public static boolean isCacheEmpty() {
         boolean status = false;
 
-        if (noteMap.size() > 0) {
+        if (cache.size() > 0) {
             status = true;
         } else {
             NotesManager.writeMessage("You don't have any notes yet!\n");

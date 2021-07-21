@@ -1,4 +1,4 @@
-package com.notes.command_for_filter;
+package com.notes.command.filter;
 
 import com.notes.Note;
 import com.notes.NotesManager;
@@ -11,7 +11,7 @@ public class FilterByHashTag implements CommandForFilter {
 
         NotesManager.writeMessage("Filtering notes by hashtag...");
 
-        if (!NotesManager.isNoteMapEmpty()) {
+        if (!NotesManager.isCacheEmpty()) {
             NotesManager.writeMessage("Enter the hashtag:");
             String tagString = NotesManager.readString();
 

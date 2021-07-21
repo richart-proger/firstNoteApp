@@ -1,4 +1,4 @@
-package com.notes.command_for_filter;
+package com.notes.command.filter;
 
 import com.notes.Note;
 import com.notes.NotesManager;
@@ -10,8 +10,8 @@ public class FilterViewNotes implements CommandForFilter {
     public void executeFilter() {
         NotesManager.writeMessage("Viewing notes...");
 
-        if (!NotesManager.isNoteMapEmpty()) {
-            Set<Note> noteSet = NotesManager.getNoteSetFromMap();
+        if (!NotesManager.isCacheEmpty()) {
+            Set<Note> noteSet = NotesManager.getNoteSetFromCache();
             NotesManager.viewNotes(noteSet);
         }
 

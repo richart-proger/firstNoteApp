@@ -1,8 +1,11 @@
-package com.notes.command_for_filter;
+package com.notes.command.filter;
 
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * The modules of the filter package contain classes that are responsible for the operation of the filter block. Available filtering options: by hashtag, by date, as well as the usual viewing of notes. The work of the class is carried out by the implementation of the command pattern
+ */
 public class FilterExecutor {
 
     private static final Map<Filter, CommandForFilter> allKnownFiltersMap = new HashMap<>();

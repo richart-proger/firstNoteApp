@@ -1,4 +1,4 @@
-package com.notes.command_for_main_menu;
+package com.notes.command.mainmenu;
 
 import com.notes.FileOperationService;
 import com.notes.Note;
@@ -12,7 +12,7 @@ public class EditNoteCommand implements Command {
     public void execute() throws ThereIsNoNoteWithIdException {
         NotesManager.writeMessage("Editing a note...");
 
-        if (!NotesManager.isNoteMapEmpty()) {
+        if (!NotesManager.isCacheEmpty()) {
             String message = "Enter the ID of the note you want to edit:";
 
             long id = NotesManager.parseToIdFromString(message);

@@ -1,4 +1,4 @@
-package com.notes.command_for_search;
+package com.notes.command.search;
 
 public enum Search {
 

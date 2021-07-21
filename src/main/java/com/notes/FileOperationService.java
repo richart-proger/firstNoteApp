@@ -4,10 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.notes.exception.CannotCreateDirException;
 import com.notes.exception.CannotCreateFileForNoteException;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * The class contains the main CRUD methods for working with files, as well as methods for maintaining
@@ -15,6 +16,11 @@ import java.util.List;
  */
 public class FileOperationService {
     private static final String DIR = "notes_package";
+    private static final File DIR_FOLDER;
+
+    static {
+        DIR_FOLDER = checkDirOrCreate();
+    }
 
     /**
      * This private method determines whether there is a directory for saving files. If the directory was
@@ -27,48 +33,66 @@ public class FileOperationService {
     private static File checkDirOrCreate() throws CannotCreateDirException {
         final File dir = new File(DIR);
 
-        if (!dir.exists()) {
-            if (dir.mkdir()) {
-                // if directory was created successfully
-                return dir;
-            } else {
-                // if directory could not be created
-                throw new CannotCreateDirException();
-            }
-        } else {
-            // if directory exists
-            return dir;
+        if (!dir.exists() && !dir.mkdir()) {
+            // if directory could not be created
+            throw new CannotCreateDirException();
         }
+        // else if directory was created successfully or already exists
+        return dir;
     }
 
     /**
+     * The method by which all json files are subtracted from the DIR directory when the application is launched.
+     *
+     * @return Map <Long, Note>
+     */
+    static Map<Long, Note> loadNoteFromFileIntoCache() {
+        List<File> fileList = FileOperationService.getListOfFileNotes();
+        Map<Long, Note> noteMap = new HashMap<>();
+
+        for (File file : fileList) {
+            try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+                while (reader.ready()) {
+                    String jsonString = reader.readLine();
+                    StringReader stringReader = new StringReader(jsonString);
+
+                    ObjectMapper mapper = new ObjectMapper();
+                    Note note = mapper.readValue(stringReader, Note.class);
+                    noteMap.put(note.getId(), note);
+                }
+            } catch (IOException e) {
+                // NOPE
+            }
+        }
+        return noteMap;
+    }
+
+
+    /**
      * Creates a json file of the note in the directory obtained using the method checkDirOrCreate().
-     * In case of successful creation, it returns true, in case of failure, it throws a new
-     * CannotCreateFileForNoteException().
+     * In case of successful creation, it returns true, in case of failure it returns false.
      *
      * @param note
      * @return
      * @throws CannotCreateFileForNoteException
      */
     public static boolean noteToFileNote(Note note) throws CannotCreateFileForNoteException {
-        File dir = checkDirOrCreate();
-        boolean statusOfOperation = false;
-
-        if (dir != null && note != null) {
-            ObjectMapper mapper = new ObjectMapper();
-            File resultFile = new File(dir, note.getId() + ".txt");
-            try {
-                if (resultFile.createNewFile()) {
-                    mapper.writeValue(resultFile, note);
-                    statusOfOperation = true;
-                } else {
-                    throw new CannotCreateFileForNoteException(note);
-                }
-            } catch (IOException e) {
-                // NOPE
-            }
+        if (note == null) {
+            return false;
         }
-        return statusOfOperation;
+
+        ObjectMapper mapper = new ObjectMapper();
+        File resultFile = new File(DIR_FOLDER, note.getId() + ".txt");
+        try {
+            if (resultFile.createNewFile()) {
+                mapper.writeValue(resultFile, note);
+                return true;
+            }
+        } catch (IOException e) {
+            // NOPE
+            throw new CannotCreateFileForNoteException(note);
+        }
+        return false;
     }
 
     /**
@@ -80,29 +104,25 @@ public class FileOperationService {
      * @return
      */
     public static boolean deleteFileNote(Long id) {
-        File dir = checkDirOrCreate();
-        boolean statusOfOperation = false;
-
-        File fileToDelete = getFileByIdFromDir(dir, id);
+        File fileToDelete = getFileByIdFromDir(id);
         if (fileToDelete != null) {
-            statusOfOperation = fileToDelete.delete();
+            return fileToDelete.delete();
         }
-        return statusOfOperation;
+        return false;
     }
 
     /**
      * Returns a File according to the specified id from the list obtained using the
-     * getListOfFileNotes() method according to the specified directory File dir
+     * getListOfFileNotes() method
      *
-     * @param dir
      * @param id
      * @return
      */
-    private static File getFileByIdFromDir(File dir, Long id) {
-        List<File> fileList = getListOfFileNotes(dir);
+    private static File getFileByIdFromDir(Long id) {
+        List<File> fileList = getListOfFileNotes();
         File fileToFind = null;
         try {
-            fileToFind = new File(dir.getCanonicalPath() + "\\" + id + ".txt");
+            fileToFind = new File(DIR_FOLDER.getCanonicalPath() + "\\" + id + ".txt");
         } catch (IOException e) {
             // NOPE
         }
@@ -130,33 +150,27 @@ public class FileOperationService {
      * @return
      */
     public static boolean editFileNote(Note previousNote, Note modifiedNote) {
-        boolean statusOfOperation = false;
-
         if (previousNote != null && modifiedNote != null) {
             deleteFileNote(previousNote.getId());
             noteToFileNote(modifiedNote);
-            statusOfOperation = true;
+            return true;
         }
-        return statusOfOperation;
+        return false;
     }
 
     /**
-     * This method returns a list of all files in the directory File dir
+     * This method returns a list of all files in the directory File DIR_FOLDER
      *
-     * @param dir
      * @return
      */
-    static List<File> getListOfFileNotes(File dir) {
-        List<File> fileList = null;
-        if (dir != null) {
-            fileList = new ArrayList<>();
-            File[] fileArray = dir.listFiles();
+    private static List<File> getListOfFileNotes() {
+        List<File> fileList = new ArrayList<>();
+        File[] fileArray = DIR_FOLDER.listFiles();
 
-            if (fileArray != null) {
-                for (File entry : fileArray) {
-                    if (entry.isFile()) {
-                        fileList.add(entry);
-                    }
+        if (fileArray != null) {
+            for (File entry : fileArray) {
+                if (entry.isFile()) {
+                    fileList.add(entry);
                 }
             }
         }

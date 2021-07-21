@@ -1,4 +1,4 @@
-package com.notes.command_for_search;
+package com.notes.command.search;
 
 import com.notes.Note;
 import com.notes.NotesManager;
@@ -10,7 +10,7 @@ public class SearchByTitle implements CommandForSearch {
     public void executeSearch() {
         NotesManager.writeMessage("Search for notes by title...");
 
-        if (!NotesManager.isNoteMapEmpty()) {
+        if (!NotesManager.isCacheEmpty()) {
             NotesManager.writeMessage("Enter the title you are searching for: ");
             String title = NotesManager.readString();
 

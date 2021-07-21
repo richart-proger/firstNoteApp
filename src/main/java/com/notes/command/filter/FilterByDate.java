@@ -1,4 +1,4 @@
-package com.notes.command_for_filter;
+package com.notes.command.filter;
 
 import com.notes.Note;
 import com.notes.NotesManager;
@@ -11,7 +11,7 @@ public class FilterByDate implements CommandForFilter {
     public void executeFilter() {
         NotesManager.writeMessage("Filtering notes by date...");
 
-        if (!NotesManager.isNoteMapEmpty()) {
+        if (!NotesManager.isCacheEmpty()) {
             String message = "Enter the desired date, e.g., 01.07.2021: ";
 
             Calendar dateForFilter;

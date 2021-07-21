@@ -1,4 +1,4 @@
-package com.notes.command_for_search;
+package com.notes.command.search;
 
 import com.notes.Note;
 import com.notes.NotesManager;
@@ -10,7 +10,7 @@ public class SearchByText implements CommandForSearch {
     public void executeSearch() {
         NotesManager.writeMessage("Search for notes by text...");
 
-        if (!NotesManager.isNoteMapEmpty()) {
+        if (!NotesManager.isCacheEmpty()) {
             NotesManager.writeMessage("Enter the substring you are looking for: ");
 
             String string = NotesManager.readString();

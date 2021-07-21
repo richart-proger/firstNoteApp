@@ -1,4 +1,4 @@
-package com.notes.command_for_filter;
+package com.notes.command.filter;
 
 public enum Filter {
     BY_HASHTAG("Filter by hashtag"),

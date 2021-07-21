@@ -1,13 +1,13 @@
-package com.notes.command_for_main_menu;
+package com.notes.command.mainmenu;
 
 import com.notes.NotesManager;
-import com.notes.command_for_search.Search;
-import com.notes.command_for_search.SearchExecutor;
+import com.notes.command.search.Search;
+import com.notes.command.search.SearchExecutor;
 
 public class SearchCommonCommand implements Command {
     @Override
     public void execute() {
-        if (!NotesManager.isNoteMapEmpty()) {
+        if (!NotesManager.isCacheEmpty()) {
             NotesManager.writeMessage("Searching notes...");
             Search search = NotesManager.askSearch();
             SearchExecutor.executeSearch(search);

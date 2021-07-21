@@ -1,30 +1,23 @@
-**Реализовать приложение "Заметки"**
+**Implement the Notes app**
 
-Приложение имеет следующие функции
-1) добавление заметки
-2) удаление заметки 
-3) редактирование заметки
-4) просмотр списка заметок с фильтрацией по дате или хэш-тегу.
-5) поиск заметок по подстроке по принципу "содержит" (поиск должен искать по тексту и по названию заметки)
+The application has the following functions
+1) adding a note
+2) deleting a note
+3) editing a note
+4) view the list of notes with filtering by date or hash tag.
+5) search for notes by substring according to the "contains" principle (the search should search by the text and by the name of the note)
 
-Пользователь имеет возможность создавать произвольное кол-во заметок.
-Созданные заметки должны быть доступны после перезапуска приложения (т.е. сохраняться в каком-то постоянном хранилище).
- 
-Параметры Заметки
+The user has the ability to create an arbitrary number of notes.
+The created notes should be available after restarting the application (i.e. saved in some permanent storage).
 
-Обязательные:
-- текст заметки
-- дата создания
+Note Parameters
 
-Необязательные:
-- список хэш-тегов
-- название
+Required:
+- the text of the note
+- date of creation
 
-Приложение можно реализовать как консольное, так и ввиде REST API. Для сборки приложения использовать Maven.
-Не использовать Spring Data
-Аутентификацию/авторизацию реализовывать не требуется.
+Optional:
+- list of hash tags
+- name
 
-Будет плюсом:
-- unit-тесты
-- javadoc
-- краткая инструкция по использованию
+The application is console-based. To build the application, use Maven.
